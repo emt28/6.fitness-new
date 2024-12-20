@@ -1,0 +1,36 @@
+services:
+  # PocketBase Backend Service
+  - type: web
+    name: athlete-manager-pb
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENCRYPTION_KEY
+        generateValue: true
+    disk:
+      name: pb-data
+      mountPath: /pb/pb_data
+      sizeGB: 1
+
+  # Frontend Service  
+  - type: web
+    name: athlete-manager-web
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_POCKETBASE_URL
+        fromService:
+          name: athlete-manager-pb
+          type: web
+          property: host

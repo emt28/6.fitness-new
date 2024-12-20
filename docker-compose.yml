@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  pocketbase:
+    build: .
+    ports:
+      - "8090:8090"
+    volumes:
+      - pb_data:/pb/pb_data
+      - ./pb_migrations:/pb/pb_migrations
+    restart: unless-stopped
+
+volumes:
+  pb_data:
